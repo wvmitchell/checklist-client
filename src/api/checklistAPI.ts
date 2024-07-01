@@ -13,4 +13,26 @@ async function getChecklists() {
       userID: "1",
     },
   });
+
+  if (!res.ok) {
+    throw new Error(`Failed to get checklists: ${res.status}`);
+  }
+  return await res.json();
 }
+
+async function getChecklist(id: string) {
+  const res = await fetch(`${BASE_URL}/checklist/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      userID: "1",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to get checklist: ${res.status}`);
+  }
+  return await res.json();
+}
+
+export { getChecklists, getChecklist };
