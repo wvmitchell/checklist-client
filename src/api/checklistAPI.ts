@@ -1,11 +1,12 @@
 // base url is the environment variable BASE_URL or http://localhost:3000
-const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 
 async function getChecklists() {
   const res = await fetch(`${BASE_URL}/checklists`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      // TODO: replace with actual user ID
       userID: "1",
     },
   });
@@ -21,6 +22,7 @@ async function getChecklist(id: string) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      // TODO: replace with actual user ID
       userID: "1",
     },
   });
@@ -31,14 +33,15 @@ async function getChecklist(id: string) {
   return await res.json();
 }
 
-async function createItem(checklistID: string, text: string) {
+async function createItem(checklistID: string, content: string) {
   const res = await fetch(`${BASE_URL}/checklist/${checklistID}/item`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      // TODO: replace with actual user ID
       userID: "1",
     },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ content }),
   });
 
   if (!res.ok) {
@@ -51,6 +54,7 @@ async function updateItem(
   checklistID: string,
   itemID: string,
   checked: boolean,
+  content: string,
 ) {
   const res = await fetch(
     `${BASE_URL}/checklist/${checklistID}/item/${itemID}`,
@@ -58,9 +62,10 @@ async function updateItem(
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        // TODO: replace with actual user ID
         userID: "1",
       },
-      body: JSON.stringify({ checked }),
+      body: JSON.stringify({ content, checked }),
     },
   );
 

@@ -14,11 +14,13 @@ function Checklist({ checklistID }: { checklistID: string }) {
       checklistID: string;
       itemID: string;
       checked: boolean;
+      content: string;
     }) => {
       return updateItem(
         variables.checklistID,
         variables.itemID,
         variables.checked,
+        variables.content,
       );
     },
     onSuccess: () => {
@@ -27,22 +29,19 @@ function Checklist({ checklistID }: { checklistID: string }) {
   });
 
   const newItemMutation = useMutation({
-    mutationFn: (variables: { checklistID: string; text: string }) => {
-      return createItem(variables.checklistID, variables.text);
+    mutationFn: (variables: { checklistID: string; content: string }) => {
+      return createItem(variables.checklistID, variables.content);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["checklist"] });
     },
   });
 
-  if (isPending) return <div>Loading...</div>;
-
-  if (isError) return <div>Error: {error.message}</div>;
-
   function toggleItem(e: React.ChangeEvent<HTMLInputElement>) {
     const itemID = e.target.id;
     const checked = e.target.checked;
-    updateItemMutation.mutate({ checklistID, itemID, checked });
+    const content = e.target.nextSibling?.textContent || "";
+    updateItemMutation.mutate({ checklistID, itemID, checked, content });
   }
 
   function handleNewItem(e: React.FormEvent<HTMLFormElement>) {
@@ -51,14 +50,18 @@ function Checklist({ checklistID }: { checklistID: string }) {
     let formData = new FormData(form);
     newItemMutation.mutate({
       checklistID,
-      text: formData.get("new-item") as string,
+      content: formData.get("new-item") as string,
     });
   }
+
+  if (isPending) return <div>Loading...</div>;
+
+  if (isError) return <div>Error: {error.message}</div>;
 
   return (
     <div>
       <h2>{data?.checklist.name}</h2>
-      {data?.checklist.items.map((item: { [key: string]: any }) => (
+      {data?.items.map((item: { [key: string]: any }) => (
         <div key={item.id}>
           <input
             type="checkbox"
@@ -66,7 +69,7 @@ function Checklist({ checklistID }: { checklistID: string }) {
             onChange={toggleItem}
             checked={item.checked}
           />
-          <label htmlFor={item.id}>{item.text}</label>
+          <label htmlFor={item.id}>{item.content}</label>
         </div>
       ))}
       <form onSubmit={handleNewItem}>
