@@ -75,4 +75,22 @@ async function updateItem(
   return await res.json();
 }
 
-export { getChecklists, getChecklist, createItem, updateItem };
+async function deleteItem(checklistID: string, itemID: string) {
+  const res = await fetch(
+    `${BASE_URL}/checklist/${checklistID}/item/${itemID}`,
+    {
+      method: "DELETE",
+      headers: {
+        // TODO: replace with actual user ID
+        userID: "1",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to delete item: ${res.status}`);
+  }
+  return await res.json();
+}
+
+export { getChecklists, getChecklist, createItem, updateItem, deleteItem };

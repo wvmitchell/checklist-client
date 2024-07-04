@@ -1,5 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getChecklist, updateItem, createItem } from "../../api/checklistAPI";
+import {
+  getChecklist,
+  createItem,
+  updateItem,
+  deleteItem,
+} from "../../api/checklistAPI";
 
 function Checklist({ checklistID }: { checklistID: string }) {
   const queryClient = useQueryClient();
@@ -37,6 +42,15 @@ function Checklist({ checklistID }: { checklistID: string }) {
     },
   });
 
+  const deleteItemMutation = useMutation({
+    mutationFn: (variables: { checklistID: string; itemID: string }) => {
+      return deleteItem(variables.checklistID, variables.itemID);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["checklist"] });
+    },
+  });
+
   function toggleItem(e: React.ChangeEvent<HTMLInputElement>) {
     const itemID = e.target.id;
     const checked = e.target.checked;
@@ -54,14 +68,22 @@ function Checklist({ checklistID }: { checklistID: string }) {
     });
   }
 
+  function handleDeleteItem(e: React.MouseEvent<HTMLButtonElement>) {
+    const itemID = e.currentTarget.id;
+    deleteItemMutation.mutate({ checklistID, itemID });
+  }
+
   if (isPending) return <div>Loading...</div>;
 
   if (isError) return <div>Error: {error.message}</div>;
 
+  let checklist = data?.checklist || {};
+  let items = data?.items || [];
+
   return (
     <div>
-      <h2>{data?.checklist.name}</h2>
-      {data?.items.map((item: { [key: string]: any }) => (
+      <h2>{checklist.name}</h2>
+      {items.map((item: { [key: string]: any }) => (
         <div key={item.id}>
           <input
             type="checkbox"
@@ -70,6 +92,9 @@ function Checklist({ checklistID }: { checklistID: string }) {
             checked={item.checked}
           />
           <label htmlFor={item.id}>{item.content}</label>
+          <button id={item.id} onClick={handleDeleteItem}>
+            Delete
+          </button>
         </div>
       ))}
       <form onSubmit={handleNewItem}>

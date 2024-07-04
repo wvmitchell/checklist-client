@@ -15,10 +15,12 @@ function App() {
 
   if (isError) return <div>Error: {error.message}</div>;
 
+  let checklists = data?.checklists || [];
+
   return (
     <div className="App">
       <h1>Checklists</h1>
-      {data?.checklists.map((checklist: { [key: string]: any }) => (
+      {checklists.map((checklist: { [key: string]: any }) => (
         <Checklist key={checklist.id} checklistID={checklist.id} />
       ))}
     </div>
