@@ -1,26 +1,28 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './components/App';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./index.css";
+import App from "./components/App";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 
 const queryClient = new QueryClient();
 
 root.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </React.StrictMode>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <Routes>
+          <Route path="/" element={<App />} />
+        </Routes>
+      </QueryClientProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
 );
 
 // If you want your app to work offline and load faster, you can change
