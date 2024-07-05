@@ -6,6 +6,14 @@ import {
   deleteItem,
 } from "../../api/checklistAPI";
 
+type ChecklistItem = {
+  id: string;
+  content: string;
+  checked: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 function Checklist({ checklistID }: { checklistID: string }) {
   const queryClient = useQueryClient();
   const { isPending, isError, data, error } = useQuery({
@@ -78,7 +86,10 @@ function Checklist({ checklistID }: { checklistID: string }) {
   if (isError) return <div>Error: {error.message}</div>;
 
   let checklist = data?.checklist || {};
-  let items = data?.items || [];
+  let items: ChecklistItem[] = data?.items || [];
+  items = items.sort(
+    (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+  );
 
   return (
     <div>
