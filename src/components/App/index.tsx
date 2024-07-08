@@ -1,8 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getChecklists } from "../../api/checklistAPI";
 import Checklist from "../Checklist";
-import "./index.css";
 
 function App() {
   const { isPending, isError, data, error } = useQuery({
@@ -18,10 +18,10 @@ function App() {
   let checklists = data?.checklists || [];
 
   return (
-    <div className="App">
-      <h1>Checklists</h1>
+    <div className="m-4 rounded border-2 border-green-400 font-mono">
+      <h1 className="text-xl font-bold">Checklists</h1>
       {checklists.map((checklist: { [key: string]: any }) => (
-        <Checklist key={checklist.id} checklistID={checklist.id} />
+        <Link to={`/checklist/${checklist.id}`}>{checklist.name}</Link>
       ))}
     </div>
   );

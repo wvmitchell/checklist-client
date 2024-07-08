@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 import {
   getChecklist,
   createItem,
@@ -14,7 +15,8 @@ type ChecklistItem = {
   updated_at: string;
 };
 
-function Checklist({ checklistID }: { checklistID: string }) {
+function Checklist() {
+  const checklistID = useParams().id || "";
   const queryClient = useQueryClient();
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["checklist", checklistID],
