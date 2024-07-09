@@ -18,10 +18,12 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/checklist/:id" element={<Checklist />} />
-        </Routes>
+        <div className="m-4 font-mono">
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/checklist/:id" element={<Checklist />} />
+          </Routes>
+        </div>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,
