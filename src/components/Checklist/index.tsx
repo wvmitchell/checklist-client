@@ -1,6 +1,10 @@
+import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { TrashIcon } from "@heroicons/react/24/solid";
+import { useParams, useLocation } from "react-router-dom";
+import { debounce } from "lodash";
 import {
+  updateChecklist,
   getChecklist,
   createItem,
   updateItem,
@@ -17,11 +21,22 @@ type ChecklistItem = {
 
 function Checklist() {
   const checklistID = useParams().id || "";
+  const [title, setTitle] = useState(useLocation().state?.title || "");
+
   const queryClient = useQueryClient();
-  const { isPending, isError, data, error } = useQuery({
+  const { isPending, isError, data, error, isSuccess } = useQuery({
     queryKey: ["checklist", checklistID],
     queryFn: () => getChecklist(checklistID),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes,
+  });
+
+  const updateChecklistMutation = useMutation({
+    mutationFn: (variables: { checklistID: string; title: string }) => {
+      return updateChecklist(variables.checklistID, variables.title);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["checklist"] });
+    },
   });
 
   const updateItemMutation = useMutation({
@@ -68,6 +83,11 @@ function Checklist() {
     updateItemMutation.mutate({ checklistID, itemID, checked, content });
   }
 
+  function handleUpdateChecklistTitle(e: React.ChangeEvent<HTMLInputElement>) {
+    setTitle(e.target.value);
+    debouncedUpdateChecklistTitle(e.target.value);
+  }
+
   function handleNewItem(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     let form = e.target as HTMLFormElement;
@@ -83,11 +103,25 @@ function Checklist() {
     deleteItemMutation.mutate({ checklistID, itemID });
   }
 
+  useEffect(() => {
+    if (isSuccess && data) {
+      setTitle(data.checklist.title);
+    }
+  }, [isSuccess, data])
+
+  const debouncedUpdateChecklistTitle = useCallback(
+    debounce(
+      (newTitle) =>
+        updateChecklistMutation.mutate({ checklistID, title: newTitle }),
+      500,
+    ),
+    [checklistID],
+  );
+
   if (isPending) return <div>Loading...</div>;
 
   if (isError) return <div>Error: {error.message}</div>;
 
-  let checklist = data?.checklist || {};
   let items: ChecklistItem[] = data?.items || [];
   items = items.sort(
     (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
@@ -95,9 +129,15 @@ function Checklist() {
 
   return (
     <div>
-      <h2>{checklist.name}</h2>
+      <input
+        type="text"
+        name="checklist-name"
+        value={title}
+        onChange={handleUpdateChecklistTitle}
+        className="w-full bg-transparent text-xl font-bold focus:outline-none"
+      />
       {items.map((item: { [key: string]: any }) => (
-        <div key={item.id}>
+        <div key={item.id} className="space-x-2">
           <input
             type="checkbox"
             id={item.id}
@@ -106,7 +146,7 @@ function Checklist() {
           />
           <label htmlFor={item.id}>{item.content}</label>
           <button id={item.id} onClick={handleDeleteItem}>
-            Delete
+            <TrashIcon className="size-6" />
           </button>
         </div>
       ))}
