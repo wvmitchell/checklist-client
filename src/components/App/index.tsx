@@ -26,7 +26,6 @@ function App() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold">Listo</h1>
       <div className="flex flex-col space-y-4">
         {checklists.map((checklist: { [key: string]: any }) => (
           <Link
