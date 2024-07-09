@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
+import Header from "./components/Header";
 import App from "./components/App";
 import Checklist from "./components/Checklist";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -19,6 +20,7 @@ root.render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <div className="m-4 font-mono">
+          <Header />
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/checklist/:id" element={<Checklist />} />

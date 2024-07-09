@@ -10,7 +10,6 @@ function App() {
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["checklists"],
     queryFn: getChecklists,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   async function createNewChecklist() {
