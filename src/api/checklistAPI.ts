@@ -33,6 +33,42 @@ async function getChecklist(id: string) {
   return await res.json();
 }
 
+async function createChecklist() {
+  const res = await fetch(`${BASE_URL}/checklist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // TODO: replace with actual user ID
+      userID: "1",
+    },
+    body: JSON.stringify({ title: "New Checklist" }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to create checklist: ${res.status}`);
+  }
+
+  return await res.json();
+}
+
+async function updateChecklist(checklistID: string, title: string) {
+  const res = await fetch(`${BASE_URL}/checklist/${checklistID}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      // TODO: replace with actual user ID
+      userID: "1",
+    },
+    body: JSON.stringify({ title }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to update checklist: ${res.status}`);
+  }
+
+  return await res.json();
+}
+
 async function createItem(checklistID: string, content: string) {
   const res = await fetch(`${BASE_URL}/checklist/${checklistID}/item`, {
     method: "POST",
@@ -93,4 +129,12 @@ async function deleteItem(checklistID: string, itemID: string) {
   return await res.json();
 }
 
-export { getChecklists, getChecklist, createItem, updateItem, deleteItem };
+export {
+  getChecklists,
+  getChecklist,
+  createChecklist,
+  updateChecklist,
+  createItem,
+  updateItem,
+  deleteItem,
+};

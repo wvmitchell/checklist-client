@@ -1,15 +1,22 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getChecklists } from "../../api/checklistAPI";
-import Checklist from "../Checklist";
+import { PencilSquareIcon } from "@heroicons/react/24/solid";
+import { getChecklists, createChecklist } from "../../api/checklistAPI";
 
 function App() {
+  const navigate = useNavigate();
+
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["checklists"],
     queryFn: getChecklists,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+
+  async function createNewChecklist() {
+    const { checklist } = await createChecklist();
+    navigate(`/checklist/${checklist.id}`);
+  }
 
   if (isPending) return <div>Loading...</div>;
 
@@ -18,11 +25,28 @@ function App() {
   let checklists = data?.checklists || [];
 
   return (
-    <div className="m-4 rounded border-2 border-green-400 font-mono">
-      <h1 className="text-xl font-bold">Checklists</h1>
-      {checklists.map((checklist: { [key: string]: any }) => (
-        <Link to={`/checklist/${checklist.id}`}>{checklist.name}</Link>
-      ))}
+    <div>
+      <h1 className="text-xl font-bold">Listo</h1>
+      <div className="flex flex-col space-y-4">
+        {checklists.map((checklist: { [key: string]: any }) => (
+          <Link
+            to={`/checklist/${checklist.id}`}
+            state={{ title: checklist.title }}
+            key={checklist.id}
+          >
+            <div className="rounded-md bg-white p-5">
+              <h2 className="font-semibold">{checklist.title}</h2>
+              <p className="text-sm text-slate-500">{checklist.created_at}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <div className="fixed bottom-5 right-5">
+        <PencilSquareIcon
+          className="h-10 w-10 text-slate-500 active:text-slate-700"
+          onClick={createNewChecklist}
+        />
+      </div>
     </div>
   );
 }
