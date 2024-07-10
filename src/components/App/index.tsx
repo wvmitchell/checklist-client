@@ -31,7 +31,7 @@ function App() {
     navigate(`/checklist/${checklist.id}`);
   }
 
-  async function handleDeleteChecklist(e: React.MouseEvent<SVGSVGElement>) {
+  async function handleDeleteChecklist(e: React.MouseEvent<HTMLButtonElement>) {
     const checklistID = e.currentTarget.id;
     deleteChecklistMutation.mutate({ checklistID });
   }
@@ -58,20 +58,20 @@ function App() {
               <p className="text-sm text-slate-500">{checklist.created_at}</p>
             </Link>
             <div className="grid justify-items-end">
-              <TrashIcon
-                className="h-5 w-5 cursor-pointer text-slate-500 hover:text-slate-700"
-                id={checklist.id}
-                onClick={handleDeleteChecklist}
-              />
+              <button onClick={handleDeleteChecklist}>
+                <TrashIcon
+                  className="h-5 w-5 cursor-pointer text-slate-500 hover:text-slate-700"
+                  id={checklist.id}
+                />
+              </button>
             </div>
           </div>
         ))}
       </div>
       <div className="fixed bottom-5 right-5">
-        <PencilSquareIcon
-          className="h-10 w-10 text-slate-500 active:text-slate-700"
-          onClick={createNewChecklist}
-        />
+        <button onClick={createNewChecklist}>
+          <PencilSquareIcon className="h-10 w-10 text-slate-500 active:text-slate-700" />
+        </button>
       </div>
     </div>
   );
