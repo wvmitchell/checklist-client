@@ -69,6 +69,23 @@ async function updateChecklist(checklistID: string, title: string) {
   return await res.json();
 }
 
+async function deleteChecklist(checklistID: string) {
+  const res = await fetch(`${BASE_URL}/checklist/${checklistID}`, {
+    method: "DELETE",
+    headers: {
+      userID: "1",
+    },
+  });
+
+  let body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(`Failed to delete checklist: ${res.status}`);
+  }
+
+  return body;
+}
+
 async function createItem(checklistID: string, content: string) {
   const res = await fetch(`${BASE_URL}/checklist/${checklistID}/item`, {
     method: "POST",
@@ -126,6 +143,7 @@ async function deleteItem(checklistID: string, itemID: string) {
   if (!res.ok) {
     throw new Error(`Failed to delete item: ${res.status}`);
   }
+
   return await res.json();
 }
 
@@ -134,6 +152,7 @@ export {
   getChecklist,
   createChecklist,
   updateChecklist,
+  deleteChecklist,
   createItem,
   updateItem,
   deleteItem,
