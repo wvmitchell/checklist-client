@@ -44,22 +44,26 @@ function App() {
 
   return (
     <div>
-      <div className="flex flex-col space-y-4">
+      <div className="grid grid-cols-1 gap-3">
         {checklists.map((checklist: { [key: string]: any }) => (
-          <div className="grid grid-cols-2 rounded-md bg-white p-5">
+          <div
+            className="grid grid-cols-[3fr_1fr] rounded-md bg-white p-5"
+            key={checklist.id}
+          >
             <Link
               to={`/checklist/${checklist.id}`}
               state={{ title: checklist.title }}
-              key={checklist.id}
             >
               <h2 className="font-semibold">{checklist.title}</h2>
               <p className="text-sm text-slate-500">{checklist.created_at}</p>
             </Link>
-            <TrashIcon
-              className="h-5 w-5 justify-end text-slate-500"
-              id={checklist.id}
-              onClick={handleDeleteChecklist}
-            />
+            <div className="grid justify-items-end">
+              <TrashIcon
+                className="h-5 w-5 cursor-pointer text-slate-500 hover:text-slate-700"
+                id={checklist.id}
+                onClick={handleDeleteChecklist}
+              />
+            </div>
           </div>
         ))}
       </div>
