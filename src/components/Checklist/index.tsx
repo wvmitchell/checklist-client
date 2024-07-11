@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/24/solid";
+import { CheckCircleIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
 import { useParams, useLocation } from "react-router-dom";
 import { debounce } from "lodash";
 import Item from "../Item";
@@ -99,16 +100,24 @@ function Checklist() {
           className="w-full bg-transparent text-xl font-bold focus:outline-none"
           disabled={locked}
         />
-        <button
-          onClick={() => setLocked(!locked)}
-          className="grid grid-cols-1 justify-items-end"
-        >
-          {locked ? (
-            <LockClosedIcon className="size-6 text-slate-700" />
-          ) : (
-            <LockOpenIcon className="size-6 text-slate-700" />
-          )}
-        </button>
+        <div className="flex justify-end">
+          <button
+            onClick={() => setLocked(!locked)}
+            className="grid grid-cols-1"
+          >
+            {locked ? (
+              <LockClosedIcon className="size-6 text-slate-700" />
+            ) : (
+              <LockOpenIcon className="size-6 text-slate-700" />
+            )}
+          </button>
+          <button>
+            <MinusCircleIcon className="size-6 text-slate-700" />
+          </button>
+          <button>
+            <CheckCircleIcon className="size-6 text-slate-700" />
+          </button>
+        </div>
       </div>
       {items.map((item: ChecklistItem) => (
         <Item
