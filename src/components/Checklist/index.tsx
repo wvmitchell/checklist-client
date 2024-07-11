@@ -1,6 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { TrashIcon } from "@heroicons/react/24/solid";
+import {
+  TrashIcon,
+  LockClosedIcon,
+  LockOpenIcon,
+} from "@heroicons/react/24/solid";
 import { useParams, useLocation } from "react-router-dom";
 import { debounce } from "lodash";
 import {
@@ -22,6 +26,7 @@ type ChecklistItem = {
 function Checklist() {
   const checklistID = useParams().id || "";
   const [title, setTitle] = useState(useLocation().state?.title || "");
+  const [locked, setLocked] = useState(false);
 
   const queryClient = useQueryClient();
   const { isPending, isError, data, error, isSuccess } = useQuery({
@@ -107,7 +112,7 @@ function Checklist() {
     if (isSuccess && data) {
       setTitle(data.checklist.title);
     }
-  }, [isSuccess, data])
+  }, [isSuccess, data]);
 
   const debouncedUpdateChecklistTitle = useCallback(
     debounce(
@@ -135,7 +140,15 @@ function Checklist() {
         value={title}
         onChange={handleUpdateChecklistTitle}
         className="w-full bg-transparent text-xl font-bold focus:outline-none"
+        disabled={locked}
       />
+      <button onClick={() => setLocked(!locked)}>
+        {locked ? (
+          <LockClosedIcon className="size-6 text-slate-700" />
+        ) : (
+          <LockOpenIcon className="size-6 text-slate-700" />
+        )}
+      </button>
       {items.map((item: { [key: string]: any }) => (
         <div key={item.id} className="space-x-2">
           <input
@@ -145,15 +158,19 @@ function Checklist() {
             checked={item.checked}
           />
           <label htmlFor={item.id}>{item.content}</label>
-          <button id={item.id} onClick={handleDeleteItem}>
-            <TrashIcon className="size-6" />
-          </button>
+          {locked ? null : (
+            <button id={item.id} onClick={handleDeleteItem}>
+              <TrashIcon className="size-6" />
+            </button>
+          )}
         </div>
       ))}
-      <form onSubmit={handleNewItem}>
-        <input type="text" name="new-item" />
-        <label htmlFor="new-item">New Item</label>
-      </form>
+      {locked ? null : (
+        <form onSubmit={handleNewItem}>
+          <input type="text" name="new-item" />
+          <label htmlFor="new-item">New Item</label>
+        </form>
+      )}
     </div>
   );
 }
