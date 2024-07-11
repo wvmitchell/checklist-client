@@ -58,11 +58,8 @@ function App() {
               <p className="text-sm text-slate-500">{checklist.created_at}</p>
             </Link>
             <div className="grid justify-items-end">
-              <button onClick={handleDeleteChecklist}>
-                <TrashIcon
-                  className="h-5 w-5 cursor-pointer text-slate-500 hover:text-slate-700"
-                  id={checklist.id}
-                />
+              <button id={checklist.id} onClick={handleDeleteChecklist}>
+                <TrashIcon className="h-5 w-5 cursor-pointer text-slate-500 hover:text-slate-700" />
               </button>
             </div>
           </div>
@@ -70,7 +67,7 @@ function App() {
       </div>
       <div className="fixed bottom-5 right-5">
         <button onClick={createNewChecklist}>
-          <PencilSquareIcon className="h-10 w-10 text-slate-500 active:text-slate-700" />
+          <PencilSquareIcon className="h-5 w-5 text-slate-500 active:text-slate-700" />
         </button>
       </div>
     </div>
