@@ -71,11 +71,11 @@ function Checklist() {
 
   const debouncedUpdateChecklistTitle = useCallback(
     debounce(
-      (newTitle) =>
+      (newTitle: string, locked: boolean) =>
         updateChecklistMutation.mutate({
           checklistID,
           title: newTitle,
-          locked,
+          locked: locked,
         }),
       500,
     ),
@@ -84,7 +84,7 @@ function Checklist() {
 
   function handleUpdateChecklistTitle(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
-    debouncedUpdateChecklistTitle(e.target.value);
+    debouncedUpdateChecklistTitle(e.target.value, locked);
   }
 
   function handleNewItem(e: React.FormEvent<HTMLFormElement>) {
