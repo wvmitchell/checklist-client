@@ -59,17 +59,21 @@ function Item({ checklistID, item, locked }: ItemProps) {
   }
 
   return (
-    <div key={item.id} className="space-x-2">
+    <div
+      key={item.id}
+      className="mt-2 grid grid-cols-[auto_1fr_auto] items-start rounded-md bg-white p-3 shadow-sm"
+    >
       <input
         type="checkbox"
         id={item.id}
         onChange={toggleItem}
         checked={item.checked}
+        className="mt-1 size-4 accent-slate-700"
       />
-      <label htmlFor={item.id}>{item.content}</label>
+      <p className="ml-4">{item.content}</p>
       {locked ? null : (
         <button id={item.id} onClick={handleDeleteItem}>
-          <TrashIcon className="size-4" />
+          <TrashIcon className="ml-4 size-4" />
         </button>
       )}
     </div>
