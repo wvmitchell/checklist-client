@@ -130,6 +130,25 @@ async function updateItem(
   return await res.json();
 }
 
+async function toggleAllItems(checklistID: string, checked: boolean) {
+  const res = await fetch(
+    `${BASE_URL}/checklist/${checklistID}/items?checked=${checked}`,
+    {
+      method: "PUT",
+      headers: {
+        // TODO: replace with actual user ID
+        userID: "1",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to toggle all items: ${res.status}`);
+  }
+
+  return await res.json();
+}
+
 async function deleteItem(checklistID: string, itemID: string) {
   const res = await fetch(
     `${BASE_URL}/checklist/${checklistID}/item/${itemID}`,
@@ -157,5 +176,6 @@ export {
   deleteChecklist,
   createItem,
   updateItem,
+  toggleAllItems,
   deleteItem,
 };
