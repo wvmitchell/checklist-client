@@ -1,18 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  TrashIcon,
-  LockClosedIcon,
-  LockOpenIcon,
-} from "@heroicons/react/24/solid";
+import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/24/solid";
 import { useParams, useLocation } from "react-router-dom";
 import { debounce } from "lodash";
+import Item from "../Item";
 import {
   updateChecklist,
   getChecklist,
   createItem,
-  updateItem,
-  deleteItem,
 } from "../../api/checklistAPI";
 
 type ChecklistItem = {
@@ -26,6 +21,7 @@ type ChecklistItem = {
 function Checklist() {
   const checklistID = useParams().id || "";
   const [title, setTitle] = useState(useLocation().state?.title || "");
+  const [items, setItems] = useState<ChecklistItem[]>([]);
   const [locked, setLocked] = useState(false);
 
   const queryClient = useQueryClient();
@@ -44,25 +40,6 @@ function Checklist() {
     },
   });
 
-  const updateItemMutation = useMutation({
-    mutationFn: (variables: {
-      checklistID: string;
-      itemID: string;
-      checked: boolean;
-      content: string;
-    }) => {
-      return updateItem(
-        variables.checklistID,
-        variables.itemID,
-        variables.checked,
-        variables.content,
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["checklist"] });
-    },
-  });
-
   const newItemMutation = useMutation({
     mutationFn: (variables: { checklistID: string; content: string }) => {
       return createItem(variables.checklistID, variables.content);
@@ -72,21 +49,25 @@ function Checklist() {
     },
   });
 
-  const deleteItemMutation = useMutation({
-    mutationFn: (variables: { checklistID: string; itemID: string }) => {
-      return deleteItem(variables.checklistID, variables.itemID);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["checklist"] });
-    },
-  });
+  useEffect(() => {
+    if (isSuccess && data) {
+      setTitle(data.checklist.title);
+      let sorted = data.items.sort(
+        (a: ChecklistItem, b: ChecklistItem) =>
+          Date.parse(a.created_at) - Date.parse(b.created_at),
+      );
+      setItems(sorted);
+    }
+  }, [isSuccess, data]);
 
-  function toggleItem(e: React.ChangeEvent<HTMLInputElement>) {
-    const itemID = e.target.id;
-    const checked = e.target.checked;
-    const content = e.target.nextSibling?.textContent || "";
-    updateItemMutation.mutate({ checklistID, itemID, checked, content });
-  }
+  const debouncedUpdateChecklistTitle = useCallback(
+    debounce(
+      (newTitle) =>
+        updateChecklistMutation.mutate({ checklistID, title: newTitle }),
+      500,
+    ),
+    [checklistID],
+  );
 
   function handleUpdateChecklistTitle(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -103,67 +84,39 @@ function Checklist() {
     });
   }
 
-  function handleDeleteItem(e: React.MouseEvent<HTMLButtonElement>) {
-    const itemID = e.currentTarget.id;
-    deleteItemMutation.mutate({ checklistID, itemID });
-  }
-
-  useEffect(() => {
-    if (isSuccess && data) {
-      setTitle(data.checklist.title);
-    }
-  }, [isSuccess, data]);
-
-  const debouncedUpdateChecklistTitle = useCallback(
-    debounce(
-      (newTitle) =>
-        updateChecklistMutation.mutate({ checklistID, title: newTitle }),
-      500,
-    ),
-    [checklistID],
-  );
-
   if (isPending) return <div>Loading...</div>;
 
   if (isError) return <div>Error: {error.message}</div>;
 
-  let items: ChecklistItem[] = data?.items || [];
-  items = items.sort(
-    (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
-  );
-
   return (
     <div>
-      <input
-        type="text"
-        name="checklist-name"
-        value={title}
-        onChange={handleUpdateChecklistTitle}
-        className="w-full bg-transparent text-xl font-bold focus:outline-none"
-        disabled={locked}
-      />
-      <button onClick={() => setLocked(!locked)}>
-        {locked ? (
-          <LockClosedIcon className="size-6 text-slate-700" />
-        ) : (
-          <LockOpenIcon className="size-6 text-slate-700" />
-        )}
-      </button>
-      {items.map((item: { [key: string]: any }) => (
-        <div key={item.id} className="space-x-2">
-          <input
-            type="checkbox"
-            id={item.id}
-            onChange={toggleItem}
-            checked={item.checked}
-          />
-          <label htmlFor={item.id}>{item.content}</label>
-          {locked ? null : (
-            <button id={item.id} onClick={handleDeleteItem}>
-              <TrashIcon className="size-6" />
-            </button>
+      <div className="grid grid-cols-2">
+        <input
+          type="text"
+          name="checklist-name"
+          value={title}
+          onChange={handleUpdateChecklistTitle}
+          className="w-full bg-transparent text-xl font-bold focus:outline-none"
+          disabled={locked}
+        />
+        <button
+          onClick={() => setLocked(!locked)}
+          className="grid grid-cols-1 justify-items-end"
+        >
+          {locked ? (
+            <LockClosedIcon className="size-6 text-slate-700" />
+          ) : (
+            <LockOpenIcon className="size-6 text-slate-700" />
           )}
-        </div>
+        </button>
+      </div>
+      {items.map((item: ChecklistItem) => (
+        <Item
+          key={item.id}
+          checklistID={checklistID}
+          item={item}
+          locked={locked}
+        />
       ))}
       {locked ? null : (
         <form onSubmit={handleNewItem}>
