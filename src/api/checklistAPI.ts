@@ -51,7 +51,11 @@ async function createChecklist() {
   return await res.json();
 }
 
-async function updateChecklist(checklistID: string, title: string) {
+async function updateChecklist(
+  checklistID: string,
+  title: string,
+  locked: boolean,
+) {
   const res = await fetch(`${BASE_URL}/checklist/${checklistID}`, {
     method: "PUT",
     headers: {
@@ -59,7 +63,7 @@ async function updateChecklist(checklistID: string, title: string) {
       // TODO: replace with actual user ID
       userID: "1",
     },
-    body: JSON.stringify({ title }),
+    body: JSON.stringify({ title, locked }),
   });
 
   if (!res.ok) {
@@ -77,13 +81,11 @@ async function deleteChecklist(checklistID: string) {
     },
   });
 
-  let body = await res.json();
-
   if (!res.ok) {
     throw new Error(`Failed to delete checklist: ${res.status}`);
   }
 
-  return body;
+  return await res.json();
 }
 
 async function createItem(checklistID: string, content: string) {

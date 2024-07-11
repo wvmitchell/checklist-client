@@ -22,7 +22,7 @@ function Checklist() {
   const checklistID = useParams().id || "";
   const [title, setTitle] = useState(useLocation().state?.title || "");
   const [items, setItems] = useState<ChecklistItem[]>([]);
-  const [locked, setLocked] = useState(false);
+  const [locked, setLocked] = useState(true);
 
   const queryClient = useQueryClient();
   const { isPending, isError, data, error, isSuccess } = useQuery({
@@ -32,8 +32,16 @@ function Checklist() {
   });
 
   const updateChecklistMutation = useMutation({
-    mutationFn: (variables: { checklistID: string; title: string }) => {
-      return updateChecklist(variables.checklistID, variables.title);
+    mutationFn: (variables: {
+      checklistID: string;
+      title: string;
+      locked: boolean;
+    }) => {
+      return updateChecklist(
+        variables.checklistID,
+        variables.title,
+        variables.locked,
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["checklist"] });
@@ -52,6 +60,7 @@ function Checklist() {
   useEffect(() => {
     if (isSuccess && data) {
       setTitle(data.checklist.title);
+      setLocked(data.checklist.locked);
       let sorted = data.items.sort(
         (a: ChecklistItem, b: ChecklistItem) =>
           Date.parse(a.created_at) - Date.parse(b.created_at),
@@ -63,7 +72,11 @@ function Checklist() {
   const debouncedUpdateChecklistTitle = useCallback(
     debounce(
       (newTitle) =>
-        updateChecklistMutation.mutate({ checklistID, title: newTitle }),
+        updateChecklistMutation.mutate({
+          checklistID,
+          title: newTitle,
+          locked,
+        }),
       500,
     ),
     [checklistID],
@@ -82,6 +95,10 @@ function Checklist() {
       checklistID,
       content: formData.get("new-item") as string,
     });
+  }
+
+  function handleLockChecklist() {
+    updateChecklistMutation.mutate({ checklistID, title, locked: !locked });
   }
 
   if (isPending) return <div>Loading...</div>;
