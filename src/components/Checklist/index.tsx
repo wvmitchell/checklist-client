@@ -182,7 +182,7 @@ function Checklist() {
               ref={inputRef}
               type="text"
               name="new-item"
-              className="rounded-sm px-1 outline-none ring-2 ring-slate-500"
+              className="rounded-sm px-1 outline-none ring-2 ring-slate-300"
             />
             <button type="submit" className="px-2">
               Add

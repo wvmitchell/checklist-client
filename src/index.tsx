@@ -19,7 +19,7 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <div className="m-4 font-mono">
+        <div className="m-4 max-w-screen-md font-mono md:mx-auto lg:mx-auto">
           <Header />
           <Routes>
             <Route path="/" element={<App />} />
